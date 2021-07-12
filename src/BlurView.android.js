@@ -5,6 +5,8 @@ import {
   requireNativeComponent,
   DeviceEventEmitter,
   ViewPropTypes,
+  Platform,
+  StyleSheet,
 } from 'react-native';
 
 const OVERLAY_COLORS = {
@@ -65,8 +67,8 @@ class BlurView extends Component {
     if (this.props.children != null) {
       throw new Error(
         '[ReactNativeBlur]: BlurView cannot contain any child views on Android. ' +
-          'You should use "position: absolute" on the BlurView, ' +
-          'and place other views in front of it.'
+        'You should use "position: absolute" on the BlurView, ' +
+        'and place other views in front of it.'
       );
     }
 
@@ -78,11 +80,15 @@ class BlurView extends Component {
         blurRadius={this.blurRadius()}
         downsampleFactor={this.downsampleFactor()}
         overlayColor={this.overlayColor()}
-        style={[{ backgroundColor: 'transparent' }, style]}
+        style={StyleSheet.compose(styles.transparent, style)}
       />
     );
   }
 }
+
+const styles = StyleSheet.create({
+  transparent: { backgroundColor: 'transparent' },
+});
 
 BlurView.propTypes = {
   ...(ViewPropTypes || View.propTypes),
@@ -92,7 +98,10 @@ BlurView.propTypes = {
   blurRadius: PropTypes.number,
   downsampleFactor: PropTypes.number,
   overlayColor: PropTypes.string,
-  viewRef: PropTypes.number.isRequired,
+  viewRef: Platform.select({
+    android: PropTypes.number.isRequired,
+    default: PropTypes.number,
+  }),
 };
 
 BlurView.defaultProps = {
